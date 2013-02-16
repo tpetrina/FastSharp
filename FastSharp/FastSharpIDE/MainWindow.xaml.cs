@@ -1,7 +1,6 @@
 ﻿namespace FastSharpIDE
 {
     using System;
-    using System.Linq;
     using System.Windows;
     using Roslyn.Scripting.CSharp;
     using Roslyn.Scripting;
@@ -11,7 +10,7 @@
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         private ScriptEngine _engine;
         private Session _session;
@@ -23,7 +22,7 @@
 x == 10";
 
             _engine = new ScriptEngine();
-            _session = Session.Create();
+            _session = _engine.CreateSession();
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -40,7 +39,7 @@ x == 10";
         {
             try
             {
-                var o = _engine.Execute(text, _session);
+                var o = _session.Execute(text);
 
                 results.Foreground = Brushes.Black;
 
@@ -56,9 +55,9 @@ x == 10";
             }
         }
 
-        private void editor_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void editor_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.Enter && Keyboard.IsKeyDown(Key.LeftCtrl))
+            if (e.Key == Key.Enter && Keyboard.IsKeyDown(Key.LeftCtrl))
                 Execute(editor.Text);
         }
     }
