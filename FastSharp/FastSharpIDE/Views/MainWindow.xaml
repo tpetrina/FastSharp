@@ -14,6 +14,7 @@
     EnableDWMDropShadow="True"
     WindowStartupLocation="CenterScreen"
     Loaded="MainWindow_Loaded"
+    FocusManager.FocusedElement="{Binding ElementName=editor}"
     >
 
     <controls:MetroWindow.Resources>
@@ -42,7 +43,11 @@
                                SyntaxHighlighting="C#"
                                FontSize="14pt"
                                Name="editor"
-                               Margin="3" ShowLineNumbers="True" WordWrap="True" KeyDown="editor_KeyDown">
+                               Margin="3"
+                               ShowLineNumbers="True"
+                               WordWrap="True"
+                               KeyDown="editor_KeyDown"
+                               >
 
             <i:Interaction.Behaviors>
                 <behaviors:BindAvalonTextEditorTextBehavior Text="{Binding Text}" />

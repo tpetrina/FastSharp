@@ -70,6 +70,7 @@ namespace FastSharpIDE.Views
             _vm.Text =
 @"var x = 10;
 x == 10";
+            editor.CaretOffset = editor.Text.Length;
 
             _vm.PropertyChanged += _vm_PropertyChanged;
 
