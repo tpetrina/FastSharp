@@ -30,6 +30,9 @@ namespace FastSharpIDE.Converters
             {
                 case StatusType.Info:
                     return "#007ACC";
+
+                case StatusType.Error:
+                    return "DarkRed";
             }
 
             return "White";

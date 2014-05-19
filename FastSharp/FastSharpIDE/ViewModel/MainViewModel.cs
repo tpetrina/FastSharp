@@ -51,11 +51,12 @@ namespace FastSharpIDE.ViewModel
         public MainViewModel()
         {
             ExecuteCommand = new RelayCommand<string>(Execute);
-            Status = new StatusViewModel();
         }
 
         private void Execute(string code)
         {
+            ExecutionResult = new ExecutionResultViewModel();
+
             try
             {
                 if (string.IsNullOrWhiteSpace(code))
@@ -65,10 +66,14 @@ namespace FastSharpIDE.ViewModel
                         Message = "Nothing to execute",
                         Type = ExecutionResultType.Warning
                     };
-
+                    Status.SetReady();
                     return;
                 }
+
+                Status.SetInfo("Executing...");
+
                 var o = _session.Execute(code);
+                Status.SetInfo("Executed");
                 var message = o == null ? "** no results from the execution **" : o.ToString();
 
                 ExecutionResult = new ExecutionResultViewModel
@@ -84,6 +89,7 @@ namespace FastSharpIDE.ViewModel
                     Message = e.ToString(),
                     Type = ExecutionResultType.Success
                 };
+                Status.SetStatus("Failed", StatusType.Error);
             }
         }
 
@@ -91,6 +97,7 @@ namespace FastSharpIDE.ViewModel
         {
             _engine = new ScriptEngine();
             _session = _engine.CreateSession();
+            Status = new StatusViewModel();
         }
     }
 }

@@ -16,7 +16,8 @@ namespace FastSharpIDE.ViewModel
 {
     public enum StatusType
     {
-        Info
+        Info,
+        Error
     }
 
     public class StatusViewModel : ViewModelBase
@@ -40,10 +41,20 @@ namespace FastSharpIDE.ViewModel
             SetReady();
         }
 
-        private void SetReady()
+        public void SetReady()
         {
-            Text = "Ready";
-            Type = StatusType.Info;
+            SetInfo("Ready");
+        }
+
+        public void SetInfo(string infoText)
+        {
+            SetStatus(infoText, StatusType.Info);
+        }
+
+        public void SetStatus(string infoText, StatusType type)
+        {
+            Text = infoText;
+            Type = type;
         }
     }
 }

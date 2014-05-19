@@ -25,5 +25,10 @@ namespace FastSharpIDE.ViewModel
     {
         public string Message { get; set; }
         public ExecutionResultType Type { get; set; }
+
+        public ExecutionResultViewModel()
+        {
+            Type = ExecutionResultType.Success;
+        }
     }
 }
