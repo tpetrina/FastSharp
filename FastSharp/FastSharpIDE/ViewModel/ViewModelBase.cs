@@ -44,6 +44,7 @@ namespace FastSharpIDE.ViewModel
             }
 
             _properties[propertyName] = newValue;
+            base.RaisePropertyChanged(propertyName);
             return true;
         }
     }
