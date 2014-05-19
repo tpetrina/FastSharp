@@ -7,7 +7,8 @@
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:behaviors="clr-namespace:FastSharpIDE.Behaviors"
     xmlns:converters="clr-namespace:FastSharpIDE.Converters"
-    Title="FastSharp" Height="550" Width="700"
+    xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+    Title="Fast Sharp" Height="550" Width="700"
     DataContext="{Binding Source={StaticResource Locator},Path=Main}"
     GlowBrush="{DynamicResource AccentColorBrush}"
     ResizeMode="CanResizeWithGrip"
@@ -16,71 +17,138 @@
     Loaded="MainWindow_Loaded"
     FocusManager.FocusedElement="{Binding ElementName=editor}"
     Deactivated="MainWindow_Deactivated"
+    ShowIconOnTitleBar="True"
+    Icon="/Images/Text Edit.png"
+    MinWidth="500"
+    MinHeight="500"
     >
 
     <controls:MetroWindow.Resources>
         <converters:StatusTypeToForegroundConverter x:Key="StatusTypeToForegroundConverter" />
         <converters:StatusTypeToBackgroundConverter x:Key="StatusTypeToBackgroundConverter" />
+        <converters:ExecutionResultTypeToForegroundConverter x:Key="ExecutionResultTypeToForegroundConverter" />
     </controls:MetroWindow.Resources>
 
-    <Grid>
+    <!--<controls:MetroWindow.RightWindowCommands>
+        <controls:WindowCommands>
+            <Button Content="settings"
+                    Command="{Binding ShowSettingsCommand}" />
+        </controls:WindowCommands>
+    </controls:MetroWindow.RightWindowCommands>-->
+
+    <Grid x:Name="LayoutRoot">
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Normal" />
+                <VisualState x:Name="Executing">
+                    <Storyboard>
+                        <DoubleAnimation
+                            Storyboard.TargetName="OverlayRectangle"
+                            Storyboard.TargetProperty="Opacity"
+                            To="0.7" Duration="0:0:0.5" />
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <i:Interaction.Behaviors>
+            <ei:DataStateBehavior Binding="{Binding IsExecuting}"
+                                  Value="True"
+                                  TrueState="Executing"
+                                  FalseState="Normal" />
+        </i:Interaction.Behaviors>
+
         <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel>
-            <Button Content="Execute all" Click="ExecuteAll_Click"
-                    Height="23" Width="100"
-                    Margin="3"/>
-            <TextBlock Margin="3">Press Control + Enter to execute selected statements.<LineBreak />Press Shift + Enter to execute everything.
-            </TextBlock>
-        </StackPanel>
+        <Grid Margin="12,24,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <avalonEdit:TextEditor Grid.Row="1"
+            <StackPanel Margin="12,0">
+                <TextBlock>Press Control + Enter to execute selected statements.<LineBreak />Press Shift + Enter to execute everything.
+                </TextBlock>
+            </StackPanel>
+
+            <Button Style="{StaticResource AccentedSquareButtonStyle}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Content="Execute all"
+                Click="ExecuteAll_Click"
+                Width="100"
+                Margin="0,0,12,12"
+                />
+
+            <avalonEdit:TextEditor Grid.Row="1"
                                FontFamily="Consolas"
                                SyntaxHighlighting="C#"
                                FontSize="14pt"
                                Name="editor"
-                               Margin="3"
+                               Margin="12,0"
                                ShowLineNumbers="True"
                                WordWrap="True"
                                KeyDown="editor_KeyDown"
                                >
 
-            <i:Interaction.Behaviors>
-                <behaviors:BindAvalonTextEditorTextBehavior Text="{Binding Text}" />
-            </i:Interaction.Behaviors>
+                <i:Interaction.Behaviors>
+                    <behaviors:BindAvalonTextEditorTextBehavior Text="{Binding Text}" />
+                </i:Interaction.Behaviors>
 
-            <avalonEdit:TextEditor.Options>
-                <avalonEdit:TextEditorOptions ShowEndOfLine="True"
+                <avalonEdit:TextEditor.Options>
+                    <avalonEdit:TextEditorOptions ShowEndOfLine="True"
                                               ShowSpaces="True"
                                               ShowTabs="True"
                                               />
-            </avalonEdit:TextEditor.Options>
-            <avalonEdit:TextEditor.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Execute"
+                </avalonEdit:TextEditor.Options>
+                <avalonEdit:TextEditor.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Execute"
                               Click="MenuItem_Click"
                               />
-                </ContextMenu>
-            </avalonEdit:TextEditor.ContextMenu>
+                    </ContextMenu>
+                </avalonEdit:TextEditor.ContextMenu>
 
-        </avalonEdit:TextEditor>
+            </avalonEdit:TextEditor>
+        </Grid>
 
-        <TextBlock TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                   Grid.Row="2" Margin="3"
-                   Name="results"
-                   Text="{Binding ExecutionResult.Message}"
+        <Border Grid.Row="1"
+                    BorderBrush="{DynamicResource AccentColorBrush}"
+                    BorderThickness="0,1,0,0"
+                    >
+            <TextBlock TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                       Padding="12,3"
+                       Name="ExecutionResults"
+                       Text="{Binding ExecutionResult.Message, StringFormat=Output: {0}}"
+                       Visibility="{Binding ExecutionResult.Message, Converter={StaticResource NullToVisibilityConverter}}"
+                       Foreground="{Binding ExecutionResult.Type, Converter={StaticResource ExecutionResultTypeToForegroundConverter}}"
                    />
+        </Border>
 
         <TextBlock Text="{Binding Status.Text}"
-                   Grid.Row="3" Grid.ColumnSpan="2"
+                   Grid.Row="2"
                    Padding="10,3"
                    Foreground="{Binding Status.Type, Converter={StaticResource StatusTypeToForegroundConverter}}"
                    Background="{Binding Status.Type, Converter={StaticResource StatusTypeToBackgroundConverter}}"
                    />
+
+        <Grid Grid.RowSpan="3"
+              >
+            <Rectangle x:Name="OverlayRectangle"
+                       Fill="Black" Opacity="0"
+                       IsHitTestVisible="{Binding IsExecuting}"/>
+            <controls:ProgressRing Foreground="{DynamicResource AccentColorBrush}"
+                                   Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                   />
+        </Grid>
+
     </Grid>
+
 </controls:MetroWindow>

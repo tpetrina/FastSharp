@@ -16,6 +16,7 @@ using GalaSoft.MvvmLight.Command;
 using Roslyn.Scripting;
 using Roslyn.Scripting.CSharp;
 using System;
+using System.Threading.Tasks;
 
 namespace FastSharpIDE.ViewModel
 {
@@ -44,6 +45,12 @@ namespace FastSharpIDE.ViewModel
             get { return Get<StatusViewModel>(); }
             set { Set(value); }
         }
+
+        public bool IsExecuting
+        {
+            get { return Get<bool>(); }
+            set { Set(value); }
+        }
         #endregion
 
         public RelayCommand<string> ExecuteCommand { get; set; }
@@ -53,8 +60,17 @@ namespace FastSharpIDE.ViewModel
             ExecuteCommand = new RelayCommand<string>(Execute);
         }
 
-        private void Execute(string code)
+        private async void Execute(string code)
         {
+            await ExecuteInternalAsync(code);
+        }
+
+        private async Task ExecuteInternalAsync(string code)
+        {
+            if (IsExecuting)
+                return;
+            IsExecuting = true;
+
             ExecutionResult = new ExecutionResultViewModel();
 
             try
@@ -72,7 +88,8 @@ namespace FastSharpIDE.ViewModel
 
                 Status.SetInfo("Executing...");
 
-                var o = _session.Execute(code);
+                var o = await Task.Run(() => _session.Execute(code));
+
                 Status.SetInfo("Executed");
                 var message = o == null ? "** no results from the execution **" : o.ToString();
 
@@ -87,10 +104,12 @@ namespace FastSharpIDE.ViewModel
                 ExecutionResult = new ExecutionResultViewModel
                 {
                     Message = e.ToString(),
-                    Type = ExecutionResultType.Success
+                    Type = ExecutionResultType.Error
                 };
                 Status.SetStatus("Failed", StatusType.Error);
             }
+
+            IsExecuting = false;
         }
 
         public void Load()

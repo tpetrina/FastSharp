@@ -95,8 +95,6 @@ x == 10";
             }
             editor.CaretOffset = editor.Text.Length;
 
-            _vm.PropertyChanged += _vm_PropertyChanged;
-
             _vm.Load();
         }
 
@@ -106,25 +104,6 @@ x == 10";
             _vm.ExecuteCommand.Execute(text);
         }
 
-        void _vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == Member<MainViewModel>.Name(m => m.ExecutionResult))
-            {
-                if (_vm.ExecutionResult == null)
-                    return;
-
-                switch (_vm.ExecutionResult.Type)
-                {
-                    case ExecutionResultType.Success:
-                        results.Foreground = Brushes.Black;
-                        break;
-
-                    case ExecutionResultType.Error:
-                        results.Foreground = Brushes.DarkRed;
-                        break;
-                }
-            }
-        }
         #endregion
 
         private async void MainWindow_Deactivated(object sender, EventArgs e)
