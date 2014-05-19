@@ -101,8 +101,11 @@
     </ApplicationDefinition>
     <Compile Include="Behaviors\BindAvalonTextEditorTextBehavior.cs" />
     <Compile Include="Common\Member.cs" />
+    <Compile Include="Converters\StatusTypeToForegroundConverter.cs" />
+    <Compile Include="Converters\StatusTypeToBackgroundConverter.cs" />
     <Compile Include="ViewModel\ExecutionResultViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\StatusViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="Views\MainWindow.xaml">

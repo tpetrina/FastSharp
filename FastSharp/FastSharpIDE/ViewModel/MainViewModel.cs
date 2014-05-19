@@ -26,22 +26,23 @@ namespace FastSharpIDE.ViewModel
         private Session _session;
         #endregion
 
-        #region Backing fields for the bindable properties
-        private string _text;
-        private ExecutionResultViewModel _executionResult;
-        #endregion
-
         #region Bindable properties
         public string Text
         {
-            get { return _text; }
-            set { Set(ref _text, value); }
+            get { return Get<string>(); }
+            set { Set(value); }
         }
 
         public ExecutionResultViewModel ExecutionResult
         {
-            get { return _executionResult; }
-            set { Set(ref _executionResult, value); }
+            get { return Get<ExecutionResultViewModel>(); }
+            set { Set(value); }
+        }
+
+        public StatusViewModel Status
+        {
+            get { return Get<StatusViewModel>(); }
+            set { Set(value); }
         }
         #endregion
 
@@ -50,6 +51,7 @@ namespace FastSharpIDE.ViewModel
         public MainViewModel()
         {
             ExecuteCommand = new RelayCommand<string>(Execute);
+            Status = new StatusViewModel();
         }
 
         private void Execute(string code)

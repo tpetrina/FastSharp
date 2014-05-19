@@ -6,6 +6,7 @@
     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:behaviors="clr-namespace:FastSharpIDE.Behaviors"
+    xmlns:converters="clr-namespace:FastSharpIDE.Converters"
     Title="FastSharp" Height="550" Width="700"
     DataContext="{Binding Source={StaticResource Locator},Path=Main}"
     GlowBrush="{DynamicResource AccentColorBrush}"
@@ -14,11 +15,18 @@
     WindowStartupLocation="CenterScreen"
     Loaded="MainWindow_Loaded"
     >
+
+    <controls:MetroWindow.Resources>
+        <converters:StatusTypeToForegroundConverter x:Key="StatusTypeToForegroundConverter" />
+        <converters:StatusTypeToBackgroundConverter x:Key="StatusTypeToBackgroundConverter" />
+    </controls:MetroWindow.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <StackPanel>
@@ -60,6 +68,13 @@
                    Grid.Row="2" Margin="3"
                    Name="results"
                    Text="{Binding ExecutionResult.Message}"
+                   />
+
+        <TextBlock Text="{Binding Status.Text}"
+                   Grid.Row="3" Grid.ColumnSpan="2"
+                   Padding="10,3"
+                   Foreground="{Binding Status.Type, Converter={StaticResource StatusTypeToForegroundConverter}}"
+                   Background="{Binding Status.Type, Converter={StaticResource StatusTypeToBackgroundConverter}}"
                    />
     </Grid>
 </controls:MetroWindow>
