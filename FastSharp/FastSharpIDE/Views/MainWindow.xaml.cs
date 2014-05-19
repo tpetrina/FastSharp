@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using FastSharpIDE.Common;
 using FastSharpIDE.ViewModel;
 using GalaSoft.MvvmLight.Ioc;
+using System;
+using System.IO;
+using System.IO.IsolatedStorage;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -27,6 +29,8 @@ namespace FastSharpIDE.Views
     /// </summary>
     public partial class MainWindow
     {
+        private const string TempFileName = "temp";
+
         private MainViewModel _vm;
 
         public MainWindow()
@@ -63,13 +67,32 @@ namespace FastSharpIDE.Views
             }
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             _vm = SimpleIoc.Default.GetInstance<MainViewModel>();
 
-            _vm.Text =
-@"var x = 10;
+            using (var isoStore = IsolatedStorageFile.GetUserStoreForAssembly())
+            {
+                if (isoStore.FileExists("temp"))
+                {
+                    using (var fileStream = isoStore.OpenFile(TempFileName, FileMode.OpenOrCreate, FileAccess.Read))
+                    using (var reader = new StreamReader(fileStream))
+                    {
+                        var text = await reader.ReadToEndAsync();
+                        if (text.EndsWith(Environment.NewLine))
+                            text = text.Substring(0, text.Length - Environment.NewLine.Length);
+                        _vm.Text = text;
+                    }
+                }
+                else
+                {
+                    _vm.Text =
+@"// Sample code
+// Run to see what happens
+var x = 10;
 x == 10";
+                }
+            }
             editor.CaretOffset = editor.Text.Length;
 
             _vm.PropertyChanged += _vm_PropertyChanged;
@@ -103,5 +126,15 @@ x == 10";
             }
         }
         #endregion
+
+        private async void MainWindow_Deactivated(object sender, EventArgs e)
+        {
+            using (var isoStore = IsolatedStorageFile.GetUserStoreForAssembly())
+            using (var fileStream = isoStore.OpenFile("temp", FileMode.Create, FileAccess.Write))
+            using (var writer = new StreamWriter(fileStream))
+            {
+                await writer.WriteLineAsync(_vm.Text);
+            }
+        }
     }
 }
