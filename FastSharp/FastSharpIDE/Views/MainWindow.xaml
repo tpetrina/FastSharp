@@ -4,12 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:behaviors="clr-namespace:FastSharpIDE.Behaviors"
     Title="FastSharp" Height="550" Width="700"
     DataContext="{Binding Source={StaticResource Locator},Path=Main}"
     GlowBrush="{DynamicResource AccentColorBrush}"
     ResizeMode="CanResizeWithGrip"
     EnableDWMDropShadow="True"
     WindowStartupLocation="CenterScreen"
+    Loaded="MainWindow_Loaded"
     >
     <Grid>
         <Grid.RowDefinitions>
@@ -31,21 +34,31 @@
                                FontSize="14pt"
                                Name="editor"
                                Margin="3" ShowLineNumbers="True" WordWrap="True" KeyDown="editor_KeyDown">
+
+            <i:Interaction.Behaviors>
+                <behaviors:BindAvalonTextEditorTextBehavior Text="{Binding Text}" />
+            </i:Interaction.Behaviors>
+
             <avalonEdit:TextEditor.Options>
                 <avalonEdit:TextEditorOptions ShowEndOfLine="True"
                                               ShowSpaces="True"
-                                              ShowTabs="True" />
+                                              ShowTabs="True"
+                                              />
             </avalonEdit:TextEditor.Options>
             <avalonEdit:TextEditor.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Execute"
-                              Click="MenuItem_Click" />
+                              Click="MenuItem_Click"
+                              />
                 </ContextMenu>
             </avalonEdit:TextEditor.ContextMenu>
+            
         </avalonEdit:TextEditor>
 
         <TextBlock TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto"
                    Grid.Row="2" Margin="3"
-                   Name="results" />
+                   Name="results"
+                   Text="{Binding ExecutionResult.Message}"
+                   />
     </Grid>
 </controls:MetroWindow>

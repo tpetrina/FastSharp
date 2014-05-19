@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using FastSharpIDE.Common;
+using FastSharpIDE.ViewModel;
+using GalaSoft.MvvmLight.Ioc;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using Roslyn.Scripting;
-using Roslyn.Scripting.CSharp;
 
 namespace FastSharpIDE.Views
 {
@@ -26,17 +26,11 @@ namespace FastSharpIDE.Views
     /// </summary>
     public partial class MainWindow
     {
-        private ScriptEngine _engine;
-        private Session _session;
+        private MainViewModel _vm;
 
         public MainWindow()
         {
             InitializeComponent();
-            editor.Text = @"var x = 10;
-x == 10";
-
-            _engine = new ScriptEngine();
-            _session = _engine.CreateSession();
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -49,30 +43,50 @@ x == 10";
             Execute(editor.Text);
         }
 
-        private void Execute(string text)
-        {
-            try
-            {
-                var o = _session.Execute(text);
-
-                results.Foreground = Brushes.Black;
-
-                if (o == null)
-                    results.Text = "** no results from the execution **";
-                else
-                    results.Text = o.ToString();
-            }
-            catch (Exception e)
-            {
-                results.Foreground = Brushes.Red;
-                results.Text = e.ToString();
-            }
-        }
-
         private void editor_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter && Keyboard.IsKeyDown(Key.LeftCtrl))
                 Execute(editor.SelectedText);
         }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            _vm = SimpleIoc.Default.GetInstance<MainViewModel>();
+
+            _vm.Text =
+@"var x = 10;
+x == 10";
+
+            _vm.PropertyChanged += _vm_PropertyChanged;
+
+            _vm.Load();
+        }
+
+        #region Interaction with the view model
+        private void Execute(string text)
+        {
+            _vm.ExecuteCommand.Execute(text);
+        }
+
+        void _vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Member<MainViewModel>.Name(m => m.ExecutionResult))
+            {
+                if (_vm.ExecutionResult == null)
+                    return;
+
+                switch (_vm.ExecutionResult.Type)
+                {
+                    case ExecutionResultType.Success:
+                        results.Foreground = Brushes.Black;
+                        break;
+
+                    case ExecutionResultType.Error:
+                        results.Foreground = Brushes.DarkRed;
+                        break;
+                }
+            }
+        } 
+        #endregion
     }
 }
