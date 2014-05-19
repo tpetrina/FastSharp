@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace FastSharpIDE
-{
-    using System;
-    using System.Windows;
-    using Roslyn.Scripting.CSharp;
-    using Roslyn.Scripting;
-    using System.Windows.Media;
-    using System.Windows.Input;
+using System;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
+using Roslyn.Scripting;
+using Roslyn.Scripting.CSharp;
 
+namespace FastSharpIDE.Views
+{
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>

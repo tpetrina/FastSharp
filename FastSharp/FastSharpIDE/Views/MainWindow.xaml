@@ -1,8 +1,10 @@
-﻿<Window x:Class="FastSharpIDE.MainWindow"
+﻿<Window x:Class="FastSharpIDE.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
-        Title="FastSharp" Height="550" Width="700">
+        Title="FastSharp" Height="550" Width="700"
+        DataContext="{Binding Source={StaticResource Locator},Path=Main}"
+        >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
