@@ -17,7 +17,8 @@ namespace FastSharpIDE.ViewModel
     public enum ExecutionResultType
     {
         Success,
-        Error
+        Error,
+        Warning
     }
 
     public class ExecutionResultViewModel : ViewModelBase

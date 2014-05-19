@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using FastSharpIDE.Common;
 using FastSharpIDE.ViewModel;
 using GalaSoft.MvvmLight.Ioc;
@@ -45,8 +46,21 @@ namespace FastSharpIDE.Views
 
         private void editor_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && Keyboard.IsKeyDown(Key.LeftCtrl))
-                Execute(editor.SelectedText);
+            if (e.Key == Key.Enter)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) ||
+                    Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    String text;
+                    if (Keyboard.IsKeyDown(Key.LeftShift) ||
+                        Keyboard.IsKeyDown(Key.RightShift))
+                        text = editor.Text;
+                    else
+                        text = editor.SelectedText;
+
+                    Execute(text);
+                }
+            }
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -86,7 +100,7 @@ x == 10";
                         break;
                 }
             }
-        } 
+        }
         #endregion
     }
 }

@@ -25,7 +25,8 @@
             <Button Content="Execute all" Click="ExecuteAll_Click"
                     Height="23" Width="100"
                     Margin="3"/>
-            <TextBlock Margin="3">Press Control + Enter to execute selected statements.</TextBlock>
+            <TextBlock Margin="3">Press Control + Enter to execute selected statements.<LineBreak />Press Shift + Enter to execute everything.
+            </TextBlock>
         </StackPanel>
 
         <avalonEdit:TextEditor Grid.Row="1"
@@ -52,7 +53,7 @@
                               />
                 </ContextMenu>
             </avalonEdit:TextEditor.ContextMenu>
-            
+
         </avalonEdit:TextEditor>
 
         <TextBlock TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto"

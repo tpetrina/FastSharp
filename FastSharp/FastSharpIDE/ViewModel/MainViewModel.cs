@@ -56,6 +56,16 @@ namespace FastSharpIDE.ViewModel
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(code))
+                {
+                    ExecutionResult = new ExecutionResultViewModel
+                    {
+                        Message = "Nothing to execute",
+                        Type = ExecutionResultType.Warning
+                    };
+
+                    return;
+                }
                 var o = _session.Execute(code);
                 var message = o == null ? "** no results from the execution **" : o.ToString();
 
