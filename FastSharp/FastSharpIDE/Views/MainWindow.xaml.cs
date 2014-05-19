@@ -72,7 +72,7 @@ x == 10";
         private void editor_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter && Keyboard.IsKeyDown(Key.LeftCtrl))
-                Execute(editor.Text);
+                Execute(editor.SelectedText);
         }
     }
 }
