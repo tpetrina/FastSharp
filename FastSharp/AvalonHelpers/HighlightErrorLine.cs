@@ -23,7 +23,7 @@ namespace AvalonHelpers
 {
     public class HighlightErrorLine : DocumentColorizingTransformer
     {
-        private Func<ReadOnlyArray<CommonDiagnostic>> _errorsFunc;
+        private readonly Func<ReadOnlyArray<CommonDiagnostic>> _errorsFunc;
 
         public HighlightErrorLine(Func<ReadOnlyArray<CommonDiagnostic>> errorsFunc)
         {
