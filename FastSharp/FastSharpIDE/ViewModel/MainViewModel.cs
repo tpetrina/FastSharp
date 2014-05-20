@@ -31,8 +31,18 @@ namespace FastSharpIDE.ViewModel
         private ScriptEngine _engine;
         private Session _session;
         private CancellationTokenSource _cancellationToken;
+        private ReadOnlyArray<CommonDiagnostic> _buildErrors;
 
-        public ReadOnlyArray<CommonDiagnostic> BuildErrors { get; set; }
+        public ReadOnlyArray<CommonDiagnostic> BuildErrors
+        {
+            get { return _buildErrors; }
+            set
+            {
+                _buildErrors = value;
+                RaisePropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Bindable properties
@@ -46,7 +56,7 @@ namespace FastSharpIDE.ViewModel
 
                 if (value != null)
                 {
-                    var observable = Observable.FromEvent<EventHandler, string>(
+                    var textChanges = Observable.FromEvent<EventHandler, string>(
                         h =>
                         {
                             EventHandler handler = (sender, e) =>
@@ -54,9 +64,18 @@ namespace FastSharpIDE.ViewModel
                             return handler;
                         },
                         h => value.TextChanged += h,
-                        h => value.TextChanged -= h)
-                        .Throttle(TimeSpan.FromMilliseconds(750));
-                    observable.Subscribe(SourceChanged);
+                        h => value.TextChanged -= h);
+
+                    value.TextChanged += (sender, args) =>
+                    {
+                        if (BuildErrors != null && BuildErrors.Any())
+                            BuildErrors = new ReadOnlyArray<CommonDiagnostic>();
+                    };
+
+                    // update errors
+                    textChanges
+                        .Throttle(TimeSpan.FromMilliseconds(750))
+                        .Subscribe(SourceChanged);
                 }
             }
         }
@@ -91,6 +110,7 @@ namespace FastSharpIDE.ViewModel
 
         public MainViewModel()
         {
+            BuildErrors = new ReadOnlyArray<CommonDiagnostic>();
             Document = new TextDocument();
 
             ExecuteCommand = new RelayCommand<string>(Execute);
@@ -179,8 +199,10 @@ namespace FastSharpIDE.ViewModel
         {
             try
             {
-                var result = _session.CompileSubmission<object>(code);
+                var session = _engine.CreateSession();
+                session.CompileSubmission<object>(code);
                 Status.SetReady();
+                BuildErrors = new ReadOnlyArray<CommonDiagnostic>();
             }
             catch (CompilationErrorException ex)
             {

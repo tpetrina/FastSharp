@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Windows.Threading;
+using AvalonHelpers;
 using FastSharpIDE.Common;
 using FastSharpIDE.ViewModel;
 using GalaSoft.MvvmLight.Ioc;
@@ -21,6 +23,7 @@ using System.IO.IsolatedStorage;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using ICSharpCode.AvalonEdit.Rendering;
 
 namespace FastSharpIDE.Views
 {
@@ -96,6 +99,20 @@ x == 10";
             editor.CaretOffset = editor.Text.Length;
 
             _vm.Load();
+
+            editor.TextArea.TextView.LineTransformers.Add(new HighlightErrorLine(() => _vm.BuildErrors));
+            _vm.PropertyChanged += _vm_PropertyChanged;
+        }
+
+        async void _vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Member<MainViewModel>.Name(m => m.BuildErrors))
+            {
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    editor.TextArea.TextView.Redraw();
+                });
+            }
         }
 
         #region Interaction with the view model

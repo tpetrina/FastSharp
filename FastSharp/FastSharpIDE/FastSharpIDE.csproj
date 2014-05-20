@@ -165,6 +165,12 @@
   <ItemGroup>
     <Resource Include="Images\Text Edit.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AvalonHelpers\AvalonHelpers.csproj">
+      <Project>{853b4d66-d91c-483a-a1a2-f8259159c63b}</Project>
+      <Name>AvalonHelpers</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
