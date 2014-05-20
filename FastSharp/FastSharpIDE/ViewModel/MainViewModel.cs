@@ -13,9 +13,14 @@
 // limitations under the License.
 
 using GalaSoft.MvvmLight.Command;
+using ICSharpCode.AvalonEdit.Document;
+using Roslyn.Compilers;
+using Roslyn.Compilers.Common;
 using Roslyn.Scripting;
 using Roslyn.Scripting.CSharp;
 using System;
+using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FastSharpIDE.ViewModel
@@ -25,9 +30,37 @@ namespace FastSharpIDE.ViewModel
         #region Roslyn interaction
         private ScriptEngine _engine;
         private Session _session;
+        private CancellationTokenSource _cancellationToken;
+
+        public ReadOnlyArray<CommonDiagnostic> BuildErrors { get; set; }
         #endregion
 
         #region Bindable properties
+
+        public TextDocument Document
+        {
+            get { return Get<TextDocument>(); }
+            set
+            {
+                Set(value);
+
+                if (value != null)
+                {
+                    var observable = Observable.FromEvent<EventHandler, string>(
+                        h =>
+                        {
+                            EventHandler handler = (sender, e) =>
+                                h(value.Text);
+                            return handler;
+                        },
+                        h => value.TextChanged += h,
+                        h => value.TextChanged -= h)
+                        .Throttle(TimeSpan.FromMilliseconds(750));
+                    observable.Subscribe(SourceChanged);
+                }
+            }
+        }
+
         public string Text
         {
             get { return Get<string>(); }
@@ -54,10 +87,20 @@ namespace FastSharpIDE.ViewModel
         #endregion
 
         public RelayCommand<string> ExecuteCommand { get; set; }
+        public RelayCommand CancelExecutionCommand { get; set; }
 
         public MainViewModel()
         {
+            Document = new TextDocument();
+
             ExecuteCommand = new RelayCommand<string>(Execute);
+            CancelExecutionCommand = new RelayCommand(CancelExecution);
+        }
+
+        private void CancelExecution()
+        {
+            if (_cancellationToken != null)
+                _cancellationToken.Cancel(true);
         }
 
         private async void Execute(string code)
@@ -88,7 +131,9 @@ namespace FastSharpIDE.ViewModel
 
                 Status.SetInfo("Executing...");
 
-                var o = await Task.Run(() => _session.Execute(code));
+                _cancellationToken = new CancellationTokenSource();
+                var o = await Task.Run(() => _session.Execute(code), _cancellationToken.Token);
+                _cancellationToken = null;
 
                 Status.SetInfo("Executed");
                 var message = o == null ? "** no results from the execution **" : o.ToString();
@@ -99,8 +144,19 @@ namespace FastSharpIDE.ViewModel
                     Type = ExecutionResultType.Success
                 };
             }
+            catch (OperationCanceledException ex)
+            {
+                _cancellationToken = null;
+                ExecutionResult = new ExecutionResultViewModel
+                {
+                    Message = "...",
+                    Type = ExecutionResultType.Warning
+                };
+                Status.SetStatus("Execution stopped", StatusType.Error);
+            }
             catch (Exception e)
             {
+                _cancellationToken = null;
                 ExecutionResult = new ExecutionResultViewModel
                 {
                     Message = e.ToString(),
@@ -117,6 +173,24 @@ namespace FastSharpIDE.ViewModel
             _engine = new ScriptEngine();
             _session = _engine.CreateSession();
             Status = new StatusViewModel();
+        }
+
+        private void SourceChanged(string code)
+        {
+            try
+            {
+                var result = _session.CompileSubmission<object>(code);
+                Status.SetReady();
+            }
+            catch (CompilationErrorException ex)
+            {
+                BuildErrors = ex.Diagnostics;
+                if (BuildErrors.Any())
+                {
+                    var error = BuildErrors[0];
+                    Status.SetStatus(error.ToString(), StatusType.Error);
+                }
+            }
         }
     }
 }

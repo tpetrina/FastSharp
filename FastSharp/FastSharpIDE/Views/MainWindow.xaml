@@ -22,6 +22,10 @@
     MinWidth="500"
     MinHeight="500"
     >
+    
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding CancelExecutionCommand}" />
+    </Window.InputBindings>
 
     <controls:MetroWindow.Resources>
         <converters:StatusTypeToForegroundConverter x:Key="StatusTypeToForegroundConverter" />
@@ -92,6 +96,7 @@
                                SyntaxHighlighting="C#"
                                FontSize="14pt"
                                Name="editor"
+                                   Document="{Binding Document}"
                                Margin="12,0"
                                ShowLineNumbers="True"
                                WordWrap="True"
