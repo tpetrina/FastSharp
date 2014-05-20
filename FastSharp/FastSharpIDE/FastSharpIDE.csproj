@@ -113,6 +113,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Behaviors\BindAvalonTextEditorTextBehavior.cs" />
+    <Compile Include="Common\ConsoleOutStream.cs" />
     <Compile Include="Common\Member.cs" />
     <Compile Include="Converters\ExecutionResultTypeToForegroundConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />

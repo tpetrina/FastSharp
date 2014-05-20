@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using FastSharpIDE.Common;
 using GalaSoft.MvvmLight.Command;
 using ICSharpCode.AvalonEdit.Document;
 using Roslyn.Compilers;
@@ -43,6 +44,7 @@ namespace FastSharpIDE.ViewModel
             }
         }
 
+        public ConsoleOutStream ConsoleOutput { get; set; }
         #endregion
 
         #region Bindable properties
@@ -74,7 +76,7 @@ namespace FastSharpIDE.ViewModel
 
                     // update errors
                     textChanges
-                        .Throttle(TimeSpan.FromMilliseconds(750))
+                        .Throttle(TimeSpan.FromMilliseconds(500))
                         .Subscribe(SourceChanged);
                 }
             }
@@ -115,6 +117,8 @@ namespace FastSharpIDE.ViewModel
 
             ExecuteCommand = new RelayCommand<string>(Execute);
             CancelExecutionCommand = new RelayCommand(CancelExecution);
+
+            Console.SetOut(ConsoleOutput = new ConsoleOutStream());
         }
 
         private void CancelExecution()
@@ -138,6 +142,8 @@ namespace FastSharpIDE.ViewModel
 
             try
             {
+                ConsoleOutput.Output.Clear();
+
                 if (string.IsNullOrWhiteSpace(code))
                 {
                     ExecutionResult = new ExecutionResultViewModel
@@ -146,6 +152,7 @@ namespace FastSharpIDE.ViewModel
                         Type = ExecutionResultType.Warning
                     };
                     Status.SetReady();
+
                     return;
                 }
 
@@ -156,7 +163,8 @@ namespace FastSharpIDE.ViewModel
                 _cancellationToken = null;
 
                 Status.SetInfo("Executed");
-                var message = o == null ? "** no results from the execution **" : o.ToString();
+                var message = ConsoleOutput.Output.ToString();
+                message += o == null ? "** no results from the execution **" : o.ToString();
 
                 ExecutionResult = new ExecutionResultViewModel
                 {
@@ -184,8 +192,10 @@ namespace FastSharpIDE.ViewModel
                 };
                 Status.SetStatus("Failed", StatusType.Error);
             }
-
-            IsExecuting = false;
+            finally
+            {
+                IsExecuting = false;
+            }
         }
 
         public void Load()
