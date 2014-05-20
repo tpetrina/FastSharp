@@ -172,7 +172,7 @@ namespace FastSharpIDE.ViewModel
                     Type = ExecutionResultType.Success
                 };
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
                 _cancellationToken = null;
                 ExecutionResult = new ExecutionResultViewModel
