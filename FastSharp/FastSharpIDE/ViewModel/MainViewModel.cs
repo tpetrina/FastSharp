@@ -76,7 +76,7 @@ namespace FastSharpIDE.ViewModel
 
                     // update errors
                     textChanges
-                        .Throttle(TimeSpan.FromMilliseconds(500))
+                        .Throttle(TimeSpan.FromMilliseconds(250))
                         .Subscribe(SourceChanged);
                 }
             }
