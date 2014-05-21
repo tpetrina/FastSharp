@@ -23,7 +23,10 @@ namespace FastSharpIDE.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (value == null) ? Visibility.Collapsed : Visibility.Visible;
+            var show = value != null;
+            if (value is string)
+                show = !string.IsNullOrWhiteSpace((string)value);
+            return show ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

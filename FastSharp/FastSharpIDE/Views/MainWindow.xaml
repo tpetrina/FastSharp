@@ -125,14 +125,14 @@
         </Grid>
 
         <Border Grid.Row="1"
-                    BorderBrush="{DynamicResource AccentColorBrush}"
-                    BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource AccentColorBrush}"
+                BorderThickness="0,1,0,0"
+                Visibility="{Binding ExecutionResult, Converter={StaticResource NullToVisibilityConverter}}"
                     >
             <TextBlock TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto"
                        Padding="12,3"
                        Name="ExecutionResults"
                        Text="{Binding ExecutionResult.Message, StringFormat=Output: {0}}"
-                       Visibility="{Binding ExecutionResult.Message, Converter={StaticResource NullToVisibilityConverter}}"
                        Foreground="{Binding ExecutionResult.Type, Converter={StaticResource ExecutionResultTypeToForegroundConverter}}"
                    />
         </Border>
