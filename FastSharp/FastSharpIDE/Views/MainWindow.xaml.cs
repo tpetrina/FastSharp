@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Windows.Threading;
 using AvalonHelpers;
 using FastSharpIDE.Common;
 using FastSharpIDE.ViewModel;
@@ -22,8 +21,6 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using ICSharpCode.AvalonEdit.Rendering;
 
 namespace FastSharpIDE.Views
 {
@@ -61,9 +58,18 @@ namespace FastSharpIDE.Views
                     String text;
                     if (Keyboard.IsKeyDown(Key.LeftShift) ||
                         Keyboard.IsKeyDown(Key.RightShift))
+                    {
                         text = editor.Text;
+                    }
                     else
+                    {
                         text = editor.SelectedText;
+                        if (string.IsNullOrWhiteSpace(text))
+                        {
+                            var line = editor.Document.GetLineByOffset(editor.CaretOffset);
+                            text = editor.Document.GetText(line.Offset, line.Length);
+                        }
+                    }
 
                     Execute(text);
                 }
@@ -101,6 +107,7 @@ x == 10";
             _vm.Load();
 
             editor.TextArea.TextView.LineTransformers.Add(new HighlightErrorLine(() => _vm.BuildErrors));
+            editor.TextArea.TextView.BackgroundRenderers.Add(new LineBackgroundRenderer(editor));
             _vm.PropertyChanged += _vm_PropertyChanged;
         }
 
