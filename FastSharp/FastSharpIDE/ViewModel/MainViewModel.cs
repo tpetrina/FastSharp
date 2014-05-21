@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
+using System.Linq;
+using FastSharp.Engine.Core;
+using FastSharp.Engine.RoslynOld;
 using FastSharpIDE.Common;
 using GalaSoft.MvvmLight.Command;
 using ICSharpCode.AvalonEdit.Document;
-using Roslyn.Compilers;
-using Roslyn.Compilers.Common;
-using Roslyn.Scripting;
-using Roslyn.Scripting.CSharp;
 using System;
 using System.Reactive.Linq;
 using System.Threading;
@@ -28,21 +28,11 @@ namespace FastSharpIDE.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
-        #region Roslyn interaction
-        private ScriptEngine _engine;
-        private Session _session;
+        #region Scripting integration
+        private IScriptingEngine _scriptingEngine;
         private CancellationTokenSource _cancellationToken;
-        private ReadOnlyArray<CommonDiagnostic> _buildErrors;
 
-        public ReadOnlyArray<CommonDiagnostic> BuildErrors
-        {
-            get { return _buildErrors; }
-            set
-            {
-                _buildErrors = value;
-                RaisePropertyChanged();
-            }
-        }
+        public ObservableCollection<CompilerError> BuildErrors { get; set; }
 
         public ConsoleOutStream ConsoleOutput { get; set; }
         #endregion
@@ -68,11 +58,7 @@ namespace FastSharpIDE.ViewModel
                         h => value.TextChanged += h,
                         h => value.TextChanged -= h);
 
-                    value.TextChanged += (sender, args) =>
-                    {
-                        if (BuildErrors != null && BuildErrors.Any())
-                            BuildErrors = new ReadOnlyArray<CommonDiagnostic>();
-                    };
+                    value.TextChanged += (sender, args) => BuildErrors.Clear();
 
                     // update errors
                     textChanges
@@ -112,7 +98,7 @@ namespace FastSharpIDE.ViewModel
 
         public MainViewModel()
         {
-            BuildErrors = new ReadOnlyArray<CommonDiagnostic>();
+            BuildErrors = new ObservableCollection<CompilerError>();
             Document = new TextDocument();
 
             ExecuteCommand = new RelayCommand<string>(Execute);
@@ -159,18 +145,26 @@ namespace FastSharpIDE.ViewModel
                 Status.SetInfo("Executing...");
 
                 _cancellationToken = new CancellationTokenSource();
-                var o = await Task.Run(() => _session.Execute(code), _cancellationToken.Token);
-                _cancellationToken = null;
+                var result = await _scriptingEngine.ExecuteAsync(code);
 
-                Status.SetInfo("Executed");
-                var message = ConsoleOutput.Output.ToString();
-                message += o == null ? "** no results from the execution **" : o.ToString();
-
-                ExecutionResult = new ExecutionResultViewModel
+                if (result.CompilerErrors.Any())
                 {
-                    Message = message,
-                    Type = ExecutionResultType.Success
-                };
+                    BuildErrors.Clear();
+                    BuildErrors.AddRange(result.CompilerErrors);
+                    Status.SetStatus(result.CompilerErrors.First().Text, StatusType.Error);
+                }
+                else
+                {
+                    var message = ConsoleOutput.Output.ToString();
+                    message += result.ReturnValue == null ? "** no results from the execution **" : result.ReturnValue.ToString();
+
+                    Status.SetInfo("Executed");
+                    ExecutionResult = new ExecutionResultViewModel
+                    {
+                        Message = message,
+                        Type = ExecutionResultType.Success
+                    };
+                }
             }
             catch (OperationCanceledException)
             {
@@ -195,33 +189,29 @@ namespace FastSharpIDE.ViewModel
             finally
             {
                 IsExecuting = false;
+                _cancellationToken = null;
             }
         }
 
         public void Load()
         {
-            _engine = new ScriptEngine();
-            _session = _engine.CreateSession();
             Status = new StatusViewModel();
+
+            _scriptingEngine = new RoslynScriptingEngine();
         }
 
         private void SourceChanged(string code)
         {
-            try
+            var result = _scriptingEngine.Compile(code);
+            BuildErrors.Clear();
+            if (result.CompilerErrors.Any())
             {
-                var session = _engine.CreateSession();
-                session.CompileSubmission<object>(code);
-                Status.SetReady();
-                BuildErrors = new ReadOnlyArray<CommonDiagnostic>();
+                BuildErrors.AddRange(result.CompilerErrors);
+                Status.SetStatus(result.CompilerErrors.First().Text, StatusType.Error);
             }
-            catch (CompilationErrorException ex)
+            else
             {
-                BuildErrors = ex.Diagnostics;
-                if (BuildErrors.Any())
-                {
-                    var error = BuildErrors[0];
-                    Status.SetStatus(error.ToString(), StatusType.Error);
-                }
+                Status.SetReady();
             }
         }
     }

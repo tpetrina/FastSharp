@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using AvalonHelpers;
-using FastSharpIDE.Common;
 using FastSharpIDE.ViewModel;
 using GalaSoft.MvvmLight.Ioc;
 using System;
@@ -106,20 +105,22 @@ x == 10";
 
             _vm.Load();
 
-            editor.TextArea.TextView.LineTransformers.Add(new HighlightErrorLine(() => _vm.BuildErrors));
+            editor.TextArea.TextView.LineTransformers.Add(new HighlightErrorLine(_vm.BuildErrors));
             editor.TextArea.TextView.BackgroundRenderers.Add(new LineBackgroundRenderer(editor));
             _vm.PropertyChanged += _vm_PropertyChanged;
+            _vm.BuildErrors.CollectionChanged += BuildErrors_CollectionChanged;
         }
 
-        async void _vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        async void BuildErrors_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (e.PropertyName == Member<MainViewModel>.Name(m => m.BuildErrors))
+            await Dispatcher.InvokeAsync(() =>
             {
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    editor.TextArea.TextView.Redraw();
-                });
-            }
+                editor.TextArea.TextView.Redraw();
+            });
+        }
+
+        void _vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
         }
 
         #region Interaction with the view model

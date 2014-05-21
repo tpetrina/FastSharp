@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
+using System.Linq;
+using FastSharp.Engine.Core;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
-using Roslyn.Compilers;
-using Roslyn.Compilers.Common;
 using System;
 using System.Windows.Media;
 
@@ -23,26 +24,25 @@ namespace AvalonHelpers
 {
     public class HighlightErrorLine : DocumentColorizingTransformer
     {
-        private readonly Func<ReadOnlyArray<CommonDiagnostic>> _errorsFunc;
+        private ObservableCollection<CompilerError> _errors;
 
-        public HighlightErrorLine(Func<ReadOnlyArray<CommonDiagnostic>> errorsFunc)
+        public HighlightErrorLine(ObservableCollection<CompilerError> errors)
         {
-            _errorsFunc = errorsFunc;
+            _errors = errors;
         }
 
         protected override void ColorizeLine(DocumentLine line)
         {
-            var errors = _errorsFunc();
-            if (errors == null)
+            if (!_errors.Any())
                 return;
 
             var text = CurrentContext.Document.GetText(line);
             var start = line.Offset;
             var end = line.Offset + text.Length;
 
-            foreach (var error in errors)
+            foreach (var error in _errors)
             {
-                var span = error.Location.SourceSpan;
+                var span = error.SourceSpan;
                 if (span.Start >= start && span.Start <= end)
                     ChangeLinePart(span.Start, Math.Min(span.End, end), HighlightError);
             }
