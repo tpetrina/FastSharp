@@ -162,3 +162,4 @@ pip-log.txt
 # Mac crap
 .DS_Store
 FastSharp/FastSharpIDE/waws-prod-am2-003.ftp.azurewebsites.windows.net/
+*.pfx
