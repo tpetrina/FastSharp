@@ -62,11 +62,16 @@ namespace FastSharpIDE.Views
                     }
                     else
                     {
-                        text = editor.SelectedText;
-                        if (string.IsNullOrWhiteSpace(text))
+                        if (string.IsNullOrWhiteSpace(editor.SelectedText))
                         {
                             var line = editor.Document.GetLineByOffset(editor.CaretOffset);
                             text = editor.Document.GetText(line.Offset, line.Length);
+                        }
+                        else
+                        {
+                            var startLine = editor.Document.GetLineByOffset(editor.SelectionStart);
+                            var endLine = editor.Document.GetLineByOffset(editor.SelectionStart + editor.SelectionLength);
+                            text = editor.Document.GetText(startLine.Offset, endLine.EndOffset - startLine.Offset);
                         }
                     }
 

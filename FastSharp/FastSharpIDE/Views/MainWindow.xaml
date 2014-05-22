@@ -78,7 +78,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Margin="12,0">
-                <TextBlock>Press Control + Enter to execute selected statements.<LineBreak />Press Shift + Enter to execute everything.
+                <TextBlock>Press Control + Enter to execute selected statements or current line.<LineBreak />Press Shift + Enter to execute everything.
                 </TextBlock>
             </StackPanel>
 
