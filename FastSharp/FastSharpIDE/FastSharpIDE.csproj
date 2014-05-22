@@ -30,7 +30,7 @@
     <InstallUrl>http://fastsharp.azurewebsites.net/clickonce/fastsharp/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationRevision>1</ApplicationRevision>
     <ApplicationVersion>0.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -127,6 +127,7 @@
     <Compile Include="Common\ConsoleOutStream.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\Member.cs" />
+    <Compile Include="Controls\LinkButton.cs" />
     <Compile Include="Converters\ExecutionResultTypeToForegroundConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Converters\StatusTypeToForegroundConverter.cs" />
