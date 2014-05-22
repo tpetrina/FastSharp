@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -12,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Massive Pixel")]
 [assembly: AssemblyProduct("FastSharpIDE")]
-[assembly: AssemblyCopyright("Copyright © Massive Pixel 2012")]
+[assembly: AssemblyCopyright("Copyright © Massive Pixel 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -54,3 +53,4 @@ using System.Windows;
 [assembly: AssemblyVersion("0.2.0.0")]
 [assembly: AssemblyFileVersion("0.2.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en")]
+[assembly: GuidAttribute("8E11CD08-7955-43B7-BAF4-041C048AE6EF")]
