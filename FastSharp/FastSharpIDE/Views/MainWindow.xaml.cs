@@ -145,5 +145,14 @@ x == 10";
                 await writer.WriteLineAsync(_vm.Text);
             }
         }
+
+        private void about_Click(object sender, RoutedEventArgs e)
+        {
+            var aboutWindow = new AboutWindow
+            {
+                Owner = this
+            };
+            aboutWindow.ShowDialog();
+        }
     }
 }

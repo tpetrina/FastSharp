@@ -33,12 +33,12 @@
         <converters:ExecutionResultTypeToForegroundConverter x:Key="ExecutionResultTypeToForegroundConverter" />
     </controls:MetroWindow.Resources>
 
-    <!--<controls:MetroWindow.RightWindowCommands>
+    <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
-            <Button Content="settings"
-                    Command="{Binding ShowSettingsCommand}" />
+            <Button Content="about"
+                    Click="about_Click" />
         </controls:WindowCommands>
-    </controls:MetroWindow.RightWindowCommands>-->
+    </controls:MetroWindow.RightWindowCommands>
 
     <Grid x:Name="LayoutRoot">
 
