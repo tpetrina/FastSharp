@@ -214,5 +214,10 @@ namespace FastSharpIDE.ViewModel
                 Status.SetReady();
             }
         }
+
+        public void Reset()
+        {
+            _scriptingEngine.Reset();
+        }
     }
 }

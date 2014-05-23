@@ -16,6 +16,7 @@ using AvalonHelpers;
 using FastSharpIDE.ViewModel;
 using GalaSoft.MvvmLight.Ioc;
 using System;
+using System.Collections.Specialized;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Windows;
@@ -78,6 +79,12 @@ namespace FastSharpIDE.Views
                     Execute(text);
                 }
             }
+            else if (e.Key == Key.R &&
+                     (Keyboard.IsKeyDown(Key.LeftCtrl) ||
+                      Keyboard.IsKeyDown(Key.RightCtrl)))
+            {
+                _vm.Reset();
+            }
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -116,12 +123,9 @@ x == 10";
             _vm.BuildErrors.CollectionChanged += BuildErrors_CollectionChanged;
         }
 
-        async void BuildErrors_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        async void BuildErrors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                editor.TextArea.TextView.Redraw();
-            });
+            await Dispatcher.InvokeAsync(() => editor.TextArea.TextView.Redraw());
         }
 
         void _vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
