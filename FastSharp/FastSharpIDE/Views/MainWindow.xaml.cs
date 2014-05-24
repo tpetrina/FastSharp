@@ -85,6 +85,12 @@ namespace FastSharpIDE.Views
             {
                 _vm.Reset();
             }
+            else if (e.Key == Key.X &&
+                     (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) &&
+                     (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
+            {
+                _vm.Text = string.Empty;
+            }
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
