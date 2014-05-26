@@ -17,11 +17,11 @@ using System.Windows.Input;
 namespace FastSharpIDE.Views
 {
     /// <summary>
-    /// Interaction logic for AboutWindow.xaml
+    /// Interaction logic for ShortcutsWindow.xaml
     /// </summary>
-    public partial class AboutWindow
+    public partial class ShortcutsWindow
     {
-        public AboutWindow()
+        public ShortcutsWindow()
         {
             InitializeComponent();
         }

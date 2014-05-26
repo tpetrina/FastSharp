@@ -35,6 +35,8 @@
 
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
+            <Button Content="shortcuts"
+                    Click="shortcuts_Click" />
             <Button Content="about"
                     Click="about_Click" />
         </controls:WindowCommands>

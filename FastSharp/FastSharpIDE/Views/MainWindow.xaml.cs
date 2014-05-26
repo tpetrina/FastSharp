@@ -164,5 +164,14 @@ x == 10";
             };
             aboutWindow.ShowDialog();
         }
+
+        private void shortcuts_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new ShortcutsWindow
+            {
+                Owner = this
+            };
+            window.ShowDialog();
+        }
     }
 }
