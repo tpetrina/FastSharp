@@ -15,7 +15,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using FastSharp.Engine.Core;
-using FastSharp.Engine.RoslynOld;
 using FastSharpIDE.Common;
 using GalaSoft.MvvmLight.Command;
 using ICSharpCode.AvalonEdit.Document;
@@ -23,6 +22,7 @@ using System;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FastSharp.Engine.Roslyn;
 
 namespace FastSharpIDE.ViewModel
 {
